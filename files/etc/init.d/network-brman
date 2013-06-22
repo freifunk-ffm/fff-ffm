@@ -1,0 +1,9 @@
+#!/bin/sh /etc/rc.common
+
+start() {
+	ifconfig bat0 up
+	brctl addbr brman
+	brctl addif brman wlan0
+	brctl addif brman bat0
+	ifconfig brman up
+}

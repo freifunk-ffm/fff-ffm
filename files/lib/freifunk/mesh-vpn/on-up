@@ -7,7 +7,10 @@ path="$( dirname "$0" )"
 
 ## Get info about board/hardware and mac address
 
-. /lib/ar71xx.sh
+# commented out by bertram (bn) because in bcm947xx architecture
+# this file is not present. it is anyhow only needed for the following
+# case statement, right?
+#. /lib/ar71xx.sh
 
 board="$(ar71xx_board_name)"
 
@@ -49,6 +52,8 @@ fi
 ## MAC-Adresse setzen
 
 ip link set address "$macaddr" up dev "$INTERFACE"
+# added by bertram: setup bridge for infrastructure mode WLAN
+/etc/init.d/network-brman start
 
 ( pwd; set ) > /tmp/XXX
 
