@@ -18,8 +18,8 @@ set wireless.wifi_mesh='wifi-iface'
 set wireless.wifi_mesh.device='radio0'
 set wireless.wifi_mesh.network='mesh'
 set wireless.wifi_mesh.mode='adhoc'
-set wireless.wifi_mesh.ssid='02:d1:11:37:fd:39'
-set wireless.wifi_mesh.bssid='02:d1:11:37:fd:39'
+set wireless.wifi_mesh.ssid='02:d1:11:37:fd:42'
+set wireless.wifi_mesh.bssid='02:d1:11:37:fd:42'
 
 commit wireless
 EOF
