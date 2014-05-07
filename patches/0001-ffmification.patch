@@ -1,0 +1,324 @@
+From 8617ad166ca3f4b895fbc582a1cad44b975a3d0f Mon Sep 17 00:00:00 2001
+From: Christof Schulze <christof.schulze@gmx.net>
+Date: Wed, 7 May 2014 01:58:02 +0200
+Subject: [PATCH 1/3] ffmification
+
+---
+ feeds.conf.default                                 | 20 +++++--
+ feeds.conf.pushable                                | 20 +++++--
+ files/etc/collectd.conf                            |  4 +-
+ files/lib/freifunk/mesh-vpn/backbone/fastd1        |  4 +-
+ files/lib/freifunk/mesh-vpn/backbone/fastd2        |  4 +-
+ files/lib/freifunk/mesh-vpn/backbone/fastd3        |  4 +-
+ files/lib/freifunk/mesh-vpn/backbone/fastd4        |  4 +-
+ files/lib/freifunk/mesh-vpn/backbone/fastd5        |  4 +-
+ files/lib/freifunk/mesh-vpn/backbone/fastd6        |  6 +-
+ files/lib/freifunk/mesh-vpn/backbone/fastd7        |  4 +-
+ files/lib/freifunk/mesh-vpn/backbone/fastd8        |  4 +-
+ files/lib/freifunk/mesh-vpn/fastd.conf             | 12 +---
+ .../lib/freifunk/upgrade/initial/020-ffm-wireless  | 26 +++++++++
+ .../lib/freifunk/upgrade/initial/020-kbu-wireless  | 66 ----------------------
+ files/lib/freifunk/upgrade/initial/040-opkg-feed   |  4 +-
+ files/lib/freifunk/upgrade/initial/050-collectd    |  2 +-
+ 16 files changed, 76 insertions(+), 112 deletions(-)
+ create mode 100755 files/lib/freifunk/upgrade/initial/020-ffm-wireless
+ delete mode 100755 files/lib/freifunk/upgrade/initial/020-kbu-wireless
+
+diff --git a/feeds.conf.default b/feeds.conf.default
+index 5e34144..673aa3c 100644
+--- a/feeds.conf.default
++++ b/feeds.conf.default
+@@ -1,6 +1,14 @@
+-src-git packages https://github.com/ff-kbu/fff-packages.git;elephants_dream
+-src-git routing https://github.com/ff-kbu/packages
+-src-git fastd https://github.com/ff-kbu/pkg_fastd
+-src-git luci https://github.com/ff-kbu/fff-luci.git;elephants_dream
+-src-git config_mode https://github.com/ff-kbu/fff-config-mode.git;v0.3-nosetup
+-src-git ath9k_watchdog https://github.com/ff-kbu/ath9k-watchdog.git;elephants_dream
++src-git packages https://github.com/freifunk-ffm/fff-packages.git;1.1
++src-git luci https://github.com/freifunk-ffm/fff-luci.git;1.1
++src-git fastd https://github.com/freifunk-ffm/fff-fastd.git;1.1
++src-git config_mode https://github.com/freifunk-ffm/fff-config-mode.git;1.1
++src-git watchdog https://github.com/freifunk-ffm/ath9k-watchdog.git;1.1
++#src-git routing https://github.com/freifunk-ffm/packages;1.1
++
++
++#src-git packages https://github.com/ff-kbu/fff-packages.git;elephants_dream
++#src-git routing https://github.com/ff-kbu/packages
++#src-git fastd https://github.com/ff-kbu/pkg_fastd
++#src-git luci https://github.com/ff-kbu/fff-luci.git;elephants_dream
++#src-git config_mode https://github.com/ff-kbu/fff-config-mode.git;v0.3-nosetup
++#src-git ath9k_watchdog https://github.com/ff-kbu/ath9k-watchdog.git;elephants_dream
+diff --git a/feeds.conf.pushable b/feeds.conf.pushable
+index a61a6d3..d58ac3d 100644
+--- a/feeds.conf.pushable
++++ b/feeds.conf.pushable
+@@ -1,6 +1,14 @@
+-src-git packages ssh://git@github.com/ff-kbu/fff-packages.git;elephants_dream
+-src-git routing ssh://git@github.com/ff-kbu/packages
+-src-git fastd ssh://git@github.com/ff-kbu/pkg_fastd
+-src-git luci ssh://git@github.com/ff-kbu/fff-luci.git;elephants_dream
+-src-git config_mode ssh://git@github.com/ff-kbu/fff-config-mode.git;v0.3-nosetup
+-src-git ath9k_watchdog ssh://git@github.com/ff-kbu/ath9k-watchdog.git;elephants_dream
++src-git packages ssh://git@github.com/freifunk-ffm/fff-packages.git;1.1
++src-git luci ssh://git@github.com/freifunk-ffm/fff-luci.git;1.1
++src-git fastd ssh://git@github.com/freifunk-ffm/fff-fastd.git;1.1
++src-git config_mode ssh://git@github.com/freifunk-ffm/fff-config-mode.git;1.1
++src-git watchdog ssh://git@github.com/freifunk-ffm/ath9k-watchdog.git;1.1
++#src-git routing ssh://git@github.com/freifunk-ffm/packages
++
++
++#src-git packages ssh://git@github.com/ff-kbu/fff-packages.git;elephants_dream
++#src-git routing ssh://git@github.com/ff-kbu/packages
++#src-git fastd ssh://git@github.com/ff-kbu/pkg_fastd
++#src-git luci ssh://git@github.com/ff-kbu/fff-luci.git;elephants_dream
++#src-git config_mode ssh://git@github.com/ff-kbu/fff-config-mode.git;v0.3-nosetup
++#src-git ath9k_watchdog ssh://git@github.com/ff-kbu/ath9k-watchdog.git;elephants_dream
+diff --git a/files/etc/collectd.conf b/files/etc/collectd.conf
+index 1981cf0..a3718e6 100644
+--- a/files/etc/collectd.conf
++++ b/files/etc/collectd.conf
+@@ -40,12 +40,12 @@ LoadPlugin ping
+ <Plugin ping>
+ 	TTL 127
+ 	Interval 30
+-	Host "fdd3:5d16:b5dd:3::6"
++	Host "fe80::216:3eff:fec9:e3e7%br-freifunk"
+ </Plugin>
+ 
+ LoadPlugin network
+ <Plugin network>
+-	Server "fdd3:5d16:b5dd:3::6" "25827"
++	Server "collectd.ffm.freifunk.net" "25827"
+ 	Forward false
+ </Plugin>
+ 
+diff --git a/files/lib/freifunk/mesh-vpn/backbone/fastd1 b/files/lib/freifunk/mesh-vpn/backbone/fastd1
+index 0825044..876de7c 100644
+--- a/files/lib/freifunk/mesh-vpn/backbone/fastd1
++++ b/files/lib/freifunk/mesh-vpn/backbone/fastd1
+@@ -1,2 +1,2 @@
+-key "4f856d95bd596ac7724edca73a19e6e9d142b374df27166bb1a78e58785efc59";
+-remote ipv4 "fastd1.kbu.freifunk.net" port 10000;
++key "6d98ed09fc260a65234a65b03ce47c9e1a19226c66220c66b89255bf569fa68b";
++remote ipv4 "fastd1.ffm.freifunk.net" port 10000;
+diff --git a/files/lib/freifunk/mesh-vpn/backbone/fastd2 b/files/lib/freifunk/mesh-vpn/backbone/fastd2
+index 31a5ace..b799487 100644
+--- a/files/lib/freifunk/mesh-vpn/backbone/fastd2
++++ b/files/lib/freifunk/mesh-vpn/backbone/fastd2
+@@ -1,2 +1,2 @@
+-key "e1916b66c4f8a795e217877cf72607d952e796463c7024dd9a6a47ae2929bc10";
+-remote ipv4 "fastd2.kbu.freifunk.net" port 10000;
++key "9a539d2761a3533b09d01065fb995b6488612ec50d61787703c0fe94a9f79967";
++remote ipv4 "fastd2.ffm.freifunk.net" port 10000;
+diff --git a/files/lib/freifunk/mesh-vpn/backbone/fastd3 b/files/lib/freifunk/mesh-vpn/backbone/fastd3
+index 73d2093..03a96c3 100644
+--- a/files/lib/freifunk/mesh-vpn/backbone/fastd3
++++ b/files/lib/freifunk/mesh-vpn/backbone/fastd3
+@@ -1,2 +1,2 @@
+-key "d56181dfe9b5ac7cfe68a94c0ce406322a9924286a751673da0dcb28ad5218b0";
+-remote ipv4 "fastd3.kbu.freifunk.net" port 10000;
++key "e16542b789ebb2f8ec258ee5f1a359ff2852ff5740fe802a35299e711ac57982";
++remote ipv4 "fastd3.ffm.freifunk.net" port 10000;
+diff --git a/files/lib/freifunk/mesh-vpn/backbone/fastd4 b/files/lib/freifunk/mesh-vpn/backbone/fastd4
+index d85f793..1197e04 100644
+--- a/files/lib/freifunk/mesh-vpn/backbone/fastd4
++++ b/files/lib/freifunk/mesh-vpn/backbone/fastd4
+@@ -1,2 +1,2 @@
+-key "9b3f65f99963343e2785c8c4fad65e70b73ee7e1205d63bd84f3e2decb53e621";
+-remote ipv4 "fastd4.kbu.freifunk.net" port 10000;
++key "e9d48b3ffa7593a736288bbb7e6f32daf9d0df4c5d03ddbadb9b7d04c334ece8";
++remote ipv4 "fastd4.ffm.freifunk.net" port 10000;
+diff --git a/files/lib/freifunk/mesh-vpn/backbone/fastd5 b/files/lib/freifunk/mesh-vpn/backbone/fastd5
+index b3ce7db..ed96eb0 100644
+--- a/files/lib/freifunk/mesh-vpn/backbone/fastd5
++++ b/files/lib/freifunk/mesh-vpn/backbone/fastd5
+@@ -1,2 +1,2 @@
+-key "6e4546121d16e7189715aef8ceb78ab58d59462720969318445f97b4301374d1";
+-remote ipv4 "fastd5.kbu.freifunk.net" port 10000;
++key "4235016b554520600d866d34fb7cccf48e7f8c8c5954ec473fabb6fd22c60ecf";
++remote ipv4 "fastd5.ffm.freifunk.net" port 10000;
+diff --git a/files/lib/freifunk/mesh-vpn/backbone/fastd6 b/files/lib/freifunk/mesh-vpn/backbone/fastd6
+index 2dd35a9..2304b04 100644
+--- a/files/lib/freifunk/mesh-vpn/backbone/fastd6
++++ b/files/lib/freifunk/mesh-vpn/backbone/fastd6
+@@ -1,4 +1,2 @@
+-key "2a2c69dbb3b9fd90d7eb8e2f70be70b472d811cd4f3743ad9f5002d14b5c94cd";
+-remote ipv4 "fastd6.kbu.freifunk.net" port 10000;
+-
+-
++key "e5c9fee48ca3b3e0a5ca59854672dfc238e1068cc1008897148fada1f9590392";
++remote ipv4 "fastd6.ffm.freifunk.net" port 10000;
+diff --git a/files/lib/freifunk/mesh-vpn/backbone/fastd7 b/files/lib/freifunk/mesh-vpn/backbone/fastd7
+index 77781ea..8a7e86e 100644
+--- a/files/lib/freifunk/mesh-vpn/backbone/fastd7
++++ b/files/lib/freifunk/mesh-vpn/backbone/fastd7
+@@ -1,2 +1,2 @@
+-key "68de6815a89270c8eaf7832deedb8da098aad2ae5793cd2cd55dec3541ad28f2";
+-remote ipv4 "fastd7.kbu.freifunk.net" port 10000;
++key "541ad0b39c10a21337f85f8c721276200f095a8df5196e97c0b6e05128df0983";
++remote ipv4 "fastd7.ffm.freifunk.net" port 10000;
+diff --git a/files/lib/freifunk/mesh-vpn/backbone/fastd8 b/files/lib/freifunk/mesh-vpn/backbone/fastd8
+index 85ea5bb..9c664da 100644
+--- a/files/lib/freifunk/mesh-vpn/backbone/fastd8
++++ b/files/lib/freifunk/mesh-vpn/backbone/fastd8
+@@ -1,2 +1,2 @@
+-key "b41a9714b1178ce428b15af0b6055cc204b39af2088ef3b371d8c36219eedd1e";
+-remote ipv4 "fastd8.kbu.freifunk.net" port 10000;
++key "55d23f51067cf83967b991cf06fee710d59b0c26d184529eb319405a5e37782e";
++remote ipv4 "fastd8.ffm.freifunk.net" port 10000;
+diff --git a/files/lib/freifunk/mesh-vpn/fastd.conf b/files/lib/freifunk/mesh-vpn/fastd.conf
+index 51c74b6..c1ded83 100644
+--- a/files/lib/freifunk/mesh-vpn/fastd.conf
++++ b/files/lib/freifunk/mesh-vpn/fastd.conf
+@@ -3,14 +3,4 @@ peer group "backbone" {
+ 	include peers from "backbone";
+ }
+ 
+-on up "
+-	/lib/freifunk/mesh-vpn/upload_key
+-	if [ \"$(uci get freifunk.@bandwidth[0].enabled)\" = 1 ]; then
+-		tc qdisc add dev $INTERFACE root tbf rate \"$(uci get freifunk.@bandwidth[0].upstream)kbit\" latency 50ms burst 2k
+-
+-		tc qdisc add dev $INTERFACE handle ffff: ingress
+-		tc filter add dev $INTERFACE parent ffff: u32 match u8 00 00 at 0 police rate \"$(uci get freifunk.@bandwidth[0].downstream)kbit\" burst 10k drop flowid :1
+-	fi
+-
+-	exit 0
+-";
++on up "./on-up";
+diff --git a/files/lib/freifunk/upgrade/initial/020-ffm-wireless b/files/lib/freifunk/upgrade/initial/020-ffm-wireless
+new file mode 100755
+index 0000000..91b4e07
+--- /dev/null
++++ b/files/lib/freifunk/upgrade/initial/020-ffm-wireless
+@@ -0,0 +1,26 @@
++#!/bin/sh
++
++uci -q batch <<EOF
++delete wireless.radio0.disabled
++delete wireless.@wifi-iface[0]
++
++set wireless.radio0.channel='1'
++set wireless.radio0.htmode='HT40+'
++set wireless.radio0.country='DE'
++
++set wireless.wifi_freifunk='wifi-iface'
++set wireless.wifi_freifunk.device='radio0'
++set wireless.wifi_freifunk.network='freifunk'
++set wireless.wifi_freifunk.mode='ap'
++set wireless.wifi_freifunk.ssid='ffm.freifunk.net'
++
++set wireless.wifi_mesh='wifi-iface'
++set wireless.wifi_mesh.device='radio0'
++set wireless.wifi_mesh.network='mesh'
++set wireless.wifi_mesh.mode='adhoc'
++set wireless.wifi_mesh.ssid='02:d1:11:37:fd:42'
++set wireless.wifi_mesh.bssid='02:d1:11:37:fd:42'
++
++commit wireless
++EOF
++
+diff --git a/files/lib/freifunk/upgrade/initial/020-kbu-wireless b/files/lib/freifunk/upgrade/initial/020-kbu-wireless
+deleted file mode 100755
+index 5e3d22c..0000000
+--- a/files/lib/freifunk/upgrade/initial/020-kbu-wireless
++++ /dev/null
+@@ -1,66 +0,0 @@
+-#!/bin/sh
+-. /lib/freifunk/lib_node.sh
+-
+-
+-# If the device has to wifi, wifi 2 has to be set up as well ..
+-uci -q batch <<EOF
+-delete wireless.radio0.disabled
+-delete wireless.@wifi-iface[0]
+-EOF
+-
+-
+-
+-
+-uci -q batch <<EOF
+-#delete wireless.radio0.disabled
+-#delete wireless.@wifi-iface[0]
+-
+-set wireless.radio0.channel='1'
+-set wireless.radio0.htmode='HT40+'
+-set wireless.radio0.country='DE'
+-
+-set wireless.wifi_freifunk='wifi-iface'
+-set wireless.wifi_freifunk.device='radio0'
+-set wireless.wifi_freifunk.network='freifunk'
+-set wireless.wifi_freifunk.mode='ap'
+-set wireless.wifi_freifunk.ssid='kbu.freifunk.net'
+-
+-set wireless.wifi_mesh='wifi-iface'
+-set wireless.wifi_mesh.device='radio0'
+-set wireless.wifi_mesh.network='mesh'
+-set wireless.wifi_mesh.mode='adhoc'
+-set wireless.wifi_mesh.ssid='02:d1:11:37:fc:39'
+-set wireless.wifi_mesh.bssid='02:d1:11:37:fc:39'
+-commit wireless
+-EOF
+-
+-
+-if is_dual_wifi ;then
+-uci -q batch <<EOF
+-delete wireless.radio1.disabled
+-delete wireless.@wifi-iface[0]
+-set wireless.radio1.channel='44'
+-set wireless.radio1.htmode='HT40+'
+-set wireless.radio1.country='DE'
+-set wireless.wifi_freifunk5='wifi-iface'
+-set wireless.wifi_freifunk5.device='radio1'
+-set wireless.wifi_freifunk5.network='freifunk'
+-set wireless.wifi_freifunk5.mode='ap'
+-set wireless.wifi_freifunk5.ssid='kbu.freifunk.net'
+-
+-set wireless.wifi_freifunk5a='wifi-iface'
+-set wireless.wifi_freifunk5a.device='radio1'
+-set wireless.wifi_freifunk5a.network='freifunk'
+-set wireless.wifi_freifunk5a.mode='ap'
+-set wireless.wifi_freifunk5a.ssid='kbu.freifunk.net (5GHz)'
+-
+-set wireless.wifi_mesh5='wifi-iface'
+-set wireless.wifi_mesh5.device='radio1'
+-set wireless.wifi_mesh5.network='mesh5'
+-set wireless.wifi_mesh5.mode='adhoc'
+-set wireless.wifi_mesh5.ssid='02:d1:11:37:fc:59'
+-set wireless.wifi_mesh5.bssid='02:d1:11:37:fc:59'
+-set batman-adv.bat0.interfaces='mesh-vpn mesh mesh5'
+-commit
+-EOF
+-fi
+diff --git a/files/lib/freifunk/upgrade/initial/040-opkg-feed b/files/lib/freifunk/upgrade/initial/040-opkg-feed
+index 9afd429..caea1c6 100755
+--- a/files/lib/freifunk/upgrade/initial/040-opkg-feed
++++ b/files/lib/freifunk/upgrade/initial/040-opkg-feed
+@@ -2,8 +2,8 @@
+ version=$(cat /etc/freifunk_version)
+ 
+ cat > /etc/opkg.conf <<EOF 
+-  src/gz ff-kbu http://jenkins.kbu.freifunk.net/files/packages/$version
+-  src/gz ff-kbu-v6 http://jenkins-v6.kbu.freifunk.net/files/packages/$version
++  src/gz ff-kbu http://jenkins.ffm.freifunk.net/files/ffm/packages/$version
++  src/gz ff-kbu-v6 http://jenkins-v6.ffm.freifunk.net/files/ffm/packages/$version
+   src/gz openwrt http://downloads.openwrt.org/snapshots/trunk/ar71xx/packages/
+   src/gz proxy http://openwrt.kbu.freifunk.net/snapshots/trunk/ar71xx/packages
+ EOF
+diff --git a/files/lib/freifunk/upgrade/initial/050-collectd b/files/lib/freifunk/upgrade/initial/050-collectd
+index 8d95b0b..1096bd8 100755
+--- a/files/lib/freifunk/upgrade/initial/050-collectd
++++ b/files/lib/freifunk/upgrade/initial/050-collectd
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ cp /rom/etc/collectd.conf /etc/
+ 
+-local hostname="$(uci get freifunk.@node[0].nodeid).nodes.kbu.freifunk.net"
++local hostname="$(uci get freifunk.@node[0].nodeid).nodes.ffm.freifunk.net"
+ 
+ cat >> /etc/collectd.conf <<EOF
+ 	Hostname   "${hostname}"
+-- 
+1.9.1
+

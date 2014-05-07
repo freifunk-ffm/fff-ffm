@@ -1,0 +1,135 @@
+From 7f48cbe094d4a6ff28bcf024ee6c750ffb0adb82 Mon Sep 17 00:00:00 2001
+From: Christof Schulze <christof.schulze@gmx.net>
+Date: Wed, 7 May 2014 01:59:18 +0200
+Subject: [PATCH 2/3] ffmification
+
+---
+ files/lib/freifunk/mesh-vpn/backbone/fastd1kbu |  2 +
+ files/lib/freifunk/mesh-vpn/backbone/fastd2kbu |  2 +
+ files/lib/freifunk/mesh-vpn/backbone/fastd3kbu |  2 +
+ files/lib/freifunk/mesh-vpn/backbone/fastd4kbu |  2 +
+ files/lib/freifunk/mesh-vpn/on-up              | 56 ++++++++++++++++++++++++++
+ files/lib/freifunk/mesh-vpn/upload_keys        | 12 ++++++
+ 6 files changed, 76 insertions(+)
+ create mode 100644 files/lib/freifunk/mesh-vpn/backbone/fastd1kbu
+ create mode 100644 files/lib/freifunk/mesh-vpn/backbone/fastd2kbu
+ create mode 100644 files/lib/freifunk/mesh-vpn/backbone/fastd3kbu
+ create mode 100644 files/lib/freifunk/mesh-vpn/backbone/fastd4kbu
+ create mode 100755 files/lib/freifunk/mesh-vpn/on-up
+ create mode 100755 files/lib/freifunk/mesh-vpn/upload_keys
+
+diff --git a/files/lib/freifunk/mesh-vpn/backbone/fastd1kbu b/files/lib/freifunk/mesh-vpn/backbone/fastd1kbu
+new file mode 100644
+index 0000000..95af226
+--- /dev/null
++++ b/files/lib/freifunk/mesh-vpn/backbone/fastd1kbu
+@@ -0,0 +1,2 @@
++key "4f856d95bd596ac7724edca73a19e6e9d142b374df27166bb1a78e58785efc59";
++remote ipv4 "fastd1kbu.ffm.freifunk.net" port 10000;
+diff --git a/files/lib/freifunk/mesh-vpn/backbone/fastd2kbu b/files/lib/freifunk/mesh-vpn/backbone/fastd2kbu
+new file mode 100644
+index 0000000..1adf45d
+--- /dev/null
++++ b/files/lib/freifunk/mesh-vpn/backbone/fastd2kbu
+@@ -0,0 +1,2 @@
++key "e1916b66c4f8a795e217877cf72607d952e796463c7024dd9a6a47ae2929bc10";
++remote ipv4 "fastd2kbu.ffm.freifunk.net" port 10000;
+diff --git a/files/lib/freifunk/mesh-vpn/backbone/fastd3kbu b/files/lib/freifunk/mesh-vpn/backbone/fastd3kbu
+new file mode 100644
+index 0000000..07bc431
+--- /dev/null
++++ b/files/lib/freifunk/mesh-vpn/backbone/fastd3kbu
+@@ -0,0 +1,2 @@
++key "d56181dfe9b5ac7cfe68a94c0ce406322a9924286a751673da0dcb28ad5218b0";
++remote ipv4 "fastd3kbu.ffm.freifunk.net" port 10000;
+diff --git a/files/lib/freifunk/mesh-vpn/backbone/fastd4kbu b/files/lib/freifunk/mesh-vpn/backbone/fastd4kbu
+new file mode 100644
+index 0000000..971e9bc
+--- /dev/null
++++ b/files/lib/freifunk/mesh-vpn/backbone/fastd4kbu
+@@ -0,0 +1,2 @@
++key "9b3f65f99963343e2785c8c4fad65e70b73ee7e1205d63bd84f3e2decb53e621";
++remote ipv4 "fastd4kbu.ffm.freifunk.net" port 10000;
+diff --git a/files/lib/freifunk/mesh-vpn/on-up b/files/lib/freifunk/mesh-vpn/on-up
+new file mode 100755
+index 0000000..ece5594
+--- /dev/null
++++ b/files/lib/freifunk/mesh-vpn/on-up
+@@ -0,0 +1,56 @@
++#!/bin/sh
++
++## Get my own path
++
++path="$( dirname "$0" )"
++
++
++## Get info about board/hardware and mac address
++
++. /lib/ar71xx.sh
++
++board="$(ar71xx_board_name)"
++
++case "$board" in
++	tl-wdr3600|\
++	tl-wdr4300)
++	        macaddr="$(uci get wireless.radio1.macaddr)"
++		;;
++	*)
++		macaddr="$(uci get wireless.radio0.macaddr)"
++		;;
++esac
++
++
++## Key-Upload
++
++"$path/upload_keys" "$macaddr" &
++	
++
++## MAC-Adresse fuer interface auswuerfeln
++
++oIFS="$IFS"
++IFS=":"
++set -- $macaddr; IFS="$oIFS"
++
++b2mask=0x02
++
++macaddr="$( printf "%02x:%s:%s:%02x:%s:%s" $(( 0x$1 | $b2mask )) $2 $3 $(( (0x$4 + 1) % 0x100 )) $5 $6 )"
++
++
++if [ "$(uci get freifunk.@bandwidth[0].enabled)" = 1 ]; then
++	tc qdisc add dev "$INTERFACE" root tbf rate "$( uci get freifunk.@bandwidth[0].upstream )kbit" latency 50ms burst 2k
++
++	tc qdisc add dev "$INTERFACE" handle ffff: ingress
++	tc filter add dev "$INTERFACE" parent ffff: u32 match u8 00 00 at 0 police rate "$( uci get freifunk.@bandwidth[0].downstream )kbit" burst 10k drop flowid :1
++fi
++
++
++## MAC-Adresse setzen
++
++ip link set address "$macaddr" up dev "$INTERFACE"
++
++( pwd; set ) > /tmp/XXX
++
++exit 0
++	
+diff --git a/files/lib/freifunk/mesh-vpn/upload_keys b/files/lib/freifunk/mesh-vpn/upload_keys
+new file mode 100755
+index 0000000..494645e
+--- /dev/null
++++ b/files/lib/freifunk/mesh-vpn/upload_keys
+@@ -0,0 +1,12 @@
++#!/bin/sh
++
++path="$( dirname "$0" )"
++
++#
++
++grep -h "remote" "$path/"*/* | sed -e 's:" .*::' -e 's:.* "::' | while read host; do
++
++	"$path/upload_key" "http://$host" "$1" &
++
++done
++
+-- 
+1.9.1
+

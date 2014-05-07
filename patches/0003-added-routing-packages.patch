@@ -1,0 +1,49 @@
+From 03d3d3f32247cc7ef411aad8032d36ad5ee008d8 Mon Sep 17 00:00:00 2001
+From: Christof Schulze <christof.schulze@gmx.net>
+Date: Wed, 7 May 2014 02:23:11 +0200
+Subject: [PATCH 3/3] added routing packages
+
+---
+ feeds.conf.default  | 10 +---------
+ feeds.conf.pushable | 10 +---------
+ 2 files changed, 2 insertions(+), 18 deletions(-)
+
+diff --git a/feeds.conf.default b/feeds.conf.default
+index 673aa3c..4721149 100644
+--- a/feeds.conf.default
++++ b/feeds.conf.default
+@@ -3,12 +3,4 @@ src-git luci https://github.com/freifunk-ffm/fff-luci.git;1.1
+ src-git fastd https://github.com/freifunk-ffm/fff-fastd.git;1.1
+ src-git config_mode https://github.com/freifunk-ffm/fff-config-mode.git;1.1
+ src-git watchdog https://github.com/freifunk-ffm/ath9k-watchdog.git;1.1
+-#src-git routing https://github.com/freifunk-ffm/packages;1.1
+-
+-
+-#src-git packages https://github.com/ff-kbu/fff-packages.git;elephants_dream
+-#src-git routing https://github.com/ff-kbu/packages
+-#src-git fastd https://github.com/ff-kbu/pkg_fastd
+-#src-git luci https://github.com/ff-kbu/fff-luci.git;elephants_dream
+-#src-git config_mode https://github.com/ff-kbu/fff-config-mode.git;v0.3-nosetup
+-#src-git ath9k_watchdog https://github.com/ff-kbu/ath9k-watchdog.git;elephants_dream
++src-git routing https://github.com/freifunk-ffm/packages;1.1
+diff --git a/feeds.conf.pushable b/feeds.conf.pushable
+index d58ac3d..3668b5b 100644
+--- a/feeds.conf.pushable
++++ b/feeds.conf.pushable
+@@ -3,12 +3,4 @@ src-git luci ssh://git@github.com/freifunk-ffm/fff-luci.git;1.1
+ src-git fastd ssh://git@github.com/freifunk-ffm/fff-fastd.git;1.1
+ src-git config_mode ssh://git@github.com/freifunk-ffm/fff-config-mode.git;1.1
+ src-git watchdog ssh://git@github.com/freifunk-ffm/ath9k-watchdog.git;1.1
+-#src-git routing ssh://git@github.com/freifunk-ffm/packages
+-
+-
+-#src-git packages ssh://git@github.com/ff-kbu/fff-packages.git;elephants_dream
+-#src-git routing ssh://git@github.com/ff-kbu/packages
+-#src-git fastd ssh://git@github.com/ff-kbu/pkg_fastd
+-#src-git luci ssh://git@github.com/ff-kbu/fff-luci.git;elephants_dream
+-#src-git config_mode ssh://git@github.com/ff-kbu/fff-config-mode.git;v0.3-nosetup
+-#src-git ath9k_watchdog ssh://git@github.com/ff-kbu/ath9k-watchdog.git;elephants_dream
++src-git routing ssh://git@github.com/freifunk-ffm/packages;1.1
+-- 
+1.9.1
+
