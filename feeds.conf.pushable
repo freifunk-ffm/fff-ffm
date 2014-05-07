@@ -1,6 +1,7 @@
 src-git packages ssh://git@github.com/freifunk-ffm/fff-packages.git;1.1
-src-git luci ssh://git@github.com/freifunk-ffm/fff-luci.git;1.1
-src-git fastd ssh://git@github.com/freifunk-ffm/fff-fastd.git;1.1
-src-git config_mode ssh://git@github.com/freifunk-ffm/fff-config-mode.git;1.1
-src-git watchdog ssh://git@github.com/freifunk-ffm/ath9k-watchdog.git;1.1
+src-git luci ssh://git@github.com/freifunk-ffm/fff-luci.git;v1_1
+src-git fastd ssh://git@github.com/freifunk-ffm/fff-fastd.git;v1_1
+src-git config_mode ssh://git@github.com/freifunk-ffm/fff-config-mode.git;v1_1
+src-git watchdog ssh://git@github.com/freifunk-ffm/ath9k-watchdog.git;v1_1
 src-git routing ssh://git@github.com/freifunk-ffm/packages;1.1
+
