@@ -14,8 +14,8 @@ proto_6rd_setup() {
 	local iface="$2"
 	local link="6rd-$cfg"
 
-	local mtu df ttl ipaddr peeraddr ip6prefix ip6prefixlen ip4prefixlen tunlink sourcerouting
-	json_get_vars mtu df ttl ipaddr peeraddr ip6prefix ip6prefixlen ip4prefixlen tunlink sourcerouting
+	local mtu df ttl ipaddr peeraddr ip6prefix ip6prefixlen ip4prefixlen tunlink sourcerouting zone
+	json_get_vars mtu df ttl ipaddr peeraddr ip6prefix ip6prefixlen ip4prefixlen tunlink sourcerouting zone
 
 	[ -z "$ip6prefix" -o -z "$peeraddr" ] && {
 		proto_notify_error "$cfg" "MISSING_ADDRESS"
@@ -26,8 +26,13 @@ proto_6rd_setup() {
 	( proto_add_host_dependency "$cfg" 0.0.0.0 )
 
 	[ -z "$ipaddr" ] && {
-		local wanif
-		if ! network_find_wan wanif || ! network_get_ipaddr ipaddr "$wanif"; then
+		local wanif="$tunlink"
+		if [ -z $wanif ] && ! network_find_wan wanif; then
+			proto_notify_error "$cfg" "NO_WAN_LINK"
+			return
+		fi
+
+		if ! network_get_ipaddr ipaddr "$wanif"; then
 			proto_notify_error "$cfg" "NO_WAN_LINK"
 			return
 		fi
@@ -68,6 +73,10 @@ proto_6rd_setup() {
 	[ -n "$tunlink" ] && json_add_string link "$tunlink"
 	proto_close_tunnel
 
+	proto_add_data
+	[ -n "$zone" ] && json_add_string zone "$zone"
+	proto_close_data
+
 	proto_send_update "$cfg"
 }
 
@@ -89,6 +98,7 @@ proto_6rd_init_config() {
 	proto_config_add_string "ip4prefixlen"
 	proto_config_add_string "tunlink"
 	proto_config_add_boolean "sourcerouting"
+	proto_config_add_string "zone"
 }
 
 [ -n "$INCLUDE_ONLY" ] || {
