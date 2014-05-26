@@ -4,31 +4,14 @@
 
 path="$( dirname "$0" )"
 
-
 ## Get info about board/hardware and mac address
-
 . /lib/ar71xx.sh
-
-board="$(ar71xx_board_name)"
-
-case "$board" in
-	tl-wdr3600|\
-	tl-wdr4300)
-	        macaddr="$(uci get wireless.radio1.macaddr)"
-		;;
-	*)
-		macaddr="$(uci get wireless.radio0.macaddr)"
-		;;
-esac
-
 
 ## Key-Upload
 
-"$path/upload_keys" "$macaddr" &
-	
+"$path/upload_keys" &
 
 ## MAC-Adresse fuer interface auswuerfeln
-
 oIFS="$IFS"
 IFS=":"
 set -- $macaddr; IFS="$oIFS"
