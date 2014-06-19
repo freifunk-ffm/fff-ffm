@@ -9,7 +9,6 @@
 /tmp
 /logs
 /feeds
-/feeds.conf
 /package/feeds
 /package/openwrt-packages
 *.orig
