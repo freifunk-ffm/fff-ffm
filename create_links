@@ -10,9 +10,9 @@ DEPLOY_PATH=${DEPLOY_PATH:-deploy-ffm}
 [[ $exitonerror -eq 1 ]] || shopt -s nullglob
 [[ $exitonerror -eq 1 ]] && set -e
 
-firmwares=( $DEPLOY_PATH/untested/*741* $DEPLOY_PATH/untested/*842* $DEPLOY_PATH/untested/*841* $DEPLOY_PATH/untested/*1043* $DEPLOY_PATH/untested/*wdr3600* $DEPLOY_PATH/untested/*wdr4300* )
+firmwares=( $DEPLOY_PATH/untested/*741* $DEPLOY_PATH/untested/*841* $DEPLOY_PATH/untested/*842* $DEPLOY_PATH/untested/*1043* $DEPLOY_PATH/untested/*wdr3600* $DEPLOY_PATH/untested/*wdr4300* 
 
-cd ${wwwdir}
+c)d ${wwwdir}
 
 ln -sf ${branch}/$ver latest-${branch}
 
