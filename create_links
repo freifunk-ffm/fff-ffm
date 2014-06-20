@@ -1,0 +1,23 @@
+#!/bin/bash
+# create stable links for latest-BRANCH and specific supported Versions
+branch=${GIT_BRANCH##*/}
+wwwdir=/var/www/files/ffm
+exitonerror=$1
+ver=$2
+
+[[ $exitonerror -eq 1 ]] || shopt -s nullglob
+
+firmwares=$(echo $DEPLOY_PATH/untested/*741* $DEPLOY_PATH/untested/*842* $DEPLOY_PATH/untested/*841* $DEPLOY_PATH/untested/*1043* $DEPLOY_PATH/untested/*wdr3600* $DEPLOY_PATH/untested/*wdr4300*)
+cd $wwwdir
+
+ln -sf ${branch}/$ver latest-$(basename ${GIT_BRANCH})
+
+cd external/$(basename ${GIT_BRANCH})
+for i in $firmwares
+do
+  fname=${i##*/}
+  type=factory
+  [[ $(echo $fname|grep -c factory) -eq 0 ]]&& type=sysupgrade
+  fpart=${i/$ver*/}
+  ln -sf ../../${ver}/firmware/${fname} ${fpart}latest-$(basename ${GIT_BRANCH})-$type.bin
+done
