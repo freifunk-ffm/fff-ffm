@@ -1,23 +1,28 @@
 #!/bin/bash
 # create stable links for latest-BRANCH and specific supported Versions
-branch=${GIT_BRANCH##*/}
+set -iux
 wwwdir=/var/www/files/ffm
 exitonerror=$1
 ver=$2
+branch=${3##*/}
 
+DEPLOY_PATH=${DEPLOY_PATH:-deploy-ffm}
 [[ $exitonerror -eq 1 ]] || shopt -s nullglob
+[[ $exitonerror -eq 1 ]] && set -e
 
-firmwares=$(echo $DEPLOY_PATH/untested/*741* $DEPLOY_PATH/untested/*842* $DEPLOY_PATH/untested/*841* $DEPLOY_PATH/untested/*1043* $DEPLOY_PATH/untested/*wdr3600* $DEPLOY_PATH/untested/*wdr4300*)
-cd $wwwdir
+firmwares=( $DEPLOY_PATH/untested/*741* $DEPLOY_PATH/untested/*842* $DEPLOY_PATH/untested/*841* $DEPLOY_PATH/untested/*1043* $DEPLOY_PATH/untested/*wdr3600* $DEPLOY_PATH/untested/*wdr4300* )
 
-ln -sf ${branch}/$ver latest-$(basename ${GIT_BRANCH})
+cd ${wwwdir}
 
-cd external/$(basename ${GIT_BRANCH})
+ln -sf ${branch}/$ver latest-${branch}
+
+cd external/${branch}
 for i in $firmwares
 do
   fname=${i##*/}
   type=factory
   [[ $(echo $fname|grep -c factory) -eq 0 ]]&& type=sysupgrade
   fpart=${i/$ver*/}
-  ln -sf ../../${ver}/firmware/${fname} ${fpart}latest-$(basename ${GIT_BRANCH})-$type.bin
+  ln -sf ../../${ver}/firmware/${fname} ${fpart}latest-$(basename ${branch})-$type.bin
 done
+
