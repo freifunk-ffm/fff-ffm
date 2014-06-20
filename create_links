@@ -1,6 +1,6 @@
 #!/bin/bash
 # create stable links for latest-BRANCH and specific supported Versions
-set -iux
+set -u
 wwwdir=/var/www/files/ffm
 exitonerror=$1
 ver=$2
@@ -17,12 +17,21 @@ cd ${wwwdir}
 ln -sf ${branch}/$ver latest-${branch}
 
 cd external/${branch}
-for i in $firmwares
+for i in ${firmwares[@]}
 do
   fname=${i##*/}
-  type=factory
-  [[ $(echo $fname|grep -c factory) -eq 0 ]]&& type=sysupgrade
-  fpart=${i/$ver*/}
-  ln -sf ../../${ver}/firmware/${fname} ${fpart}latest-$(basename ${branch})-$type.bin
+
+  [[ ! -f ../../${branch}/${ver}/firmware/${fname} ]] &&
+  {
+    echo $fname not found
+    [[ $exitonerror -eq 1 ]] && exit 1
+  } || 
+  {
+    type=factory
+    [[ $(echo $fname|grep -c factory) -eq 0 ]] && type=sysupgrade
+    fpart=${fname%%$type*}
+    rm ${fpart}latest-${branch}-$type.bin
+    ln -s ../../${branch}/${ver}/firmware/${fname} ${fpart}latest-${branch}-$type.bin
+  }
 done
 
