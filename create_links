@@ -31,7 +31,10 @@ do
     fi
   else
     type=factory
-    [[ $(echo $fname|grep -c factory) -eq 0 ]] && type=sysupgrade
+    if [[ $(echo $fname|grep -c factory) -eq 0 ]]
+    then
+      type=sysupgrade
+    fi
     fpart=${fname%%$type*}
     rm ${fpart}latest-${branch}-$type.bin
     ln -s ../../${branch}/${ver}/firmware/${fname} ${fpart}latest-${branch}-$type.bin
