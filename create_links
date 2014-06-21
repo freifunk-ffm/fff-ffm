@@ -12,7 +12,7 @@ DEPLOY_PATH=${DEPLOY_PATH:-deploy-ffm}
 
 firmwares=( $DEPLOY_PATH/untested/*741* $DEPLOY_PATH/untested/*841* $DEPLOY_PATH/untested/*842* $DEPLOY_PATH/untested/*1043* $DEPLOY_PATH/untested/*wdr3600* $DEPLOY_PATH/untested/*wdr4300* 
 
-c)d ${wwwdir}
+cd ${wwwdir}
 
 ln -sf ${branch}/$ver latest-${branch}
 
