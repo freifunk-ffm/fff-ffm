@@ -21,17 +21,17 @@ for i in ${firmwares[@]}
 do
   fname=${i##*/}
 
-  [[ ! -f ../../${branch}/${ver}/firmware/${fname} ]] &&
-  {
+  if [[ ! -f "../../${branch}/${ver}/firmware/${fname}" ]]
+  then
+  
     echo $fname not found
     [[ $exitonerror -eq 1 ]] && exit 1
-  } || 
-  {
+  else
     type=factory
     [[ $(echo $fname|grep -c factory) -eq 0 ]] && type=sysupgrade
     fpart=${fname%%$type*}
     rm ${fpart}latest-${branch}-$type.bin
     ln -s ../../${branch}/${ver}/firmware/${fname} ${fpart}latest-${branch}-$type.bin
-  }
+  fi
 done
 
