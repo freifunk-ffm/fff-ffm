@@ -25,7 +25,10 @@ do
   then
   
     echo $fname not found
-    [[ $exitonerror -eq 1 ]] && exit 1
+    if [[ $exitonerror -eq 1 ]]
+    then 
+      exit 1
+    fi
   else
     type=factory
     [[ $(echo $fname|grep -c factory) -eq 0 ]] && type=sysupgrade
