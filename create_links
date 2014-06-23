@@ -6,7 +6,7 @@ exitonerror=$1
 ver=$2
 branch=${3##*/}
 
-DEPLOY_PATH=${DEPLOY_PATH:-deploy-ffm}
+DEPLOY_PATH="$(pwd)/${DEPLOY_PATH:-deploy-ffm}"
 [[ $exitonerror -eq 1 ]] || shopt -s nullglob
 [[ $exitonerror -eq 1 ]] && set -e
 
@@ -21,15 +21,16 @@ for i in ${firmwares[@]}
 do
   fname=${i##*/}
 
-  if [[ ! -f "../../${branch}/${ver}/firmware/${fname}" ]]
+  if [[ ! -f "${i}" ]]
   then
   
-    echo $fname not found
+    echo $fname not found - maybe the software does not fit into the flash of the device?
     if [[ $exitonerror -eq 1 ]]
     then 
       exit 1
     fi
   else
+# images are not deployed yet - still create the links.
     type=factory
     if [[ $(echo $fname|grep -c factory) -eq 0 ]]
     then
