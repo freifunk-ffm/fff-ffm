@@ -19,8 +19,6 @@ ln -sf ${branch}/$ver latest-${branch}
 cd external/${branch}
 rm -f all_firmwares MD5SUMS SHA256SUMS
 ln -sf ../../${branch}/${ver}/firmware all_firmwares
-ln -sf ../../${branch}/${ver}/firmware/MD5SUMS MD5SUMS
-ln -sf ../../${branch}/${ver}/firmware/SHA256SUMS SHA256SUMS
 
 for i in ${firmwares[@]}
 do
@@ -47,3 +45,5 @@ do
   fi
 done
 
+md5sum *.bin >MD5SUMS
+sha256sum *.bin >SHA256SUMS
