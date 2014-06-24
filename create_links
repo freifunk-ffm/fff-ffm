@@ -37,7 +37,7 @@ do
       type=sysupgrade
     fi
     fpart=${fname%%$type*}
-    rm ${fpart}latest-${branch}-$type.bin
+    rm -f ${fpart}latest-${branch}-$type.bin
     ln -s ../../${branch}/${ver}/firmware/${fname} ${fpart}latest-${branch}-$type.bin
   fi
 done
