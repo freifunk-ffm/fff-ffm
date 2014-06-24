@@ -15,8 +15,11 @@ firmwares=( $DEPLOY_PATH/untested/*741* $DEPLOY_PATH/untested/*841* $DEPLOY_PATH
 cd ${wwwdir}
 
 ln -sf ${branch}/$ver latest-${branch}
-
 cd external/${branch}
+ln -sf ../../${branch}/${ver}/firmware all_firmwares
+ln -sf ../../${branch}/${ver}/firmware/MD5SUMS MD5SUMS
+ln -sf ../../${branch}/${ver}/firmware/SHA256SUMS SHA256SUMS
+
 for i in ${firmwares[@]}
 do
   fname=${i##*/}
