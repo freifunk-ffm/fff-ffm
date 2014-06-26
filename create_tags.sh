@@ -1,4 +1,5 @@
 tagname=$1
+set -ix
 sed "s/$2/$1/g" < feeds.conf.default > feeds.conf
 git commit -m "Tagged feeds" feeds.conf
 git push

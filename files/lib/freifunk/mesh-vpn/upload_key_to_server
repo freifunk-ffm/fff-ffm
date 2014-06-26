@@ -7,7 +7,7 @@ MAC=$(uci get freifunk.@node[0].nodeid)
 
 while [ 1 = 1 ]
 do
-  $WGETC -O - -q "$UPLOAD_URL/upload_key?nodeid=${MAC}&_method=post&key=${KEY}&fw_version=${VERSION}" && break
+  $WGETC -O - -q "$UPLOAD_URL/upload_key?nodeid=${MAC}&_method=post&key=${KEY}&fw_version=${VERSION}"  2>&1 |grep -q 201 && break
   sleep 30
 done
 
