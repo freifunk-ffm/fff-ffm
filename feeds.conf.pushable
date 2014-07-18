@@ -3,4 +3,4 @@ src-git luci ssh://git@github.com/freifunk-ffm/fff-luci.git;dev
 src-git fastd ssh://git@github.com/freifunk-ffm/fff-fastd.git;dev
 src-git config_mode ssh://git@github.com/freifunk-ffm/fff-config-mode.git;dev
 src-git watchdog ssh://git@github.com/freifunk-ffm/ath9k-watchdog.git;dev
-src-git routing ssh://git@github.com/freifunk-ffm/packages;dev
+src-git routing ssh://git@github.com/freifunk-ffm/packages03;dev
